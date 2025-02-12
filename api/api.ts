@@ -1,8 +1,16 @@
-// api/api.ts
+import { Platform } from 'react-native';
+import axios from 'axios';
 
-const BASE_URL = "http://localhost:3000";  
+const BASE_URL = Platform.select({
+ 
+  android: 'http://172.16.11.36:3000', 
+  ios: 'http://localhost:3000',
+  default: 'http://localhost:3000',
+});
 
-export const fetchWarehousemans = async () => {
-  const response = await fetch(`${BASE_URL}/warehousemans`);
-  return response.json();
-};
+export const api = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
