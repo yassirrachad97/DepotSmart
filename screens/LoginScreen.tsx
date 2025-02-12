@@ -13,11 +13,11 @@ import {
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { AuthService } from '../services/auth';
+import { Ionicons } from '@expo/vector-icons';
 
 
 type RootStackParamList = {
-  Home: undefined;
- 
+  Home: { userId: number };
 };
 
 interface LoginScreenProps {
@@ -27,6 +27,7 @@ interface LoginScreenProps {
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [secretKey, setSecretKey] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showSecretKey, setShowSecretKey] = useState<boolean>(false);
 
   const handleLogin = async () => {
     console.log("🔑 Secret Key Entered:", secretKey);
@@ -35,9 +36,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       const warehouseman = await AuthService.login(secretKey);
   
       if (warehouseman) {
+        console.log("✅ Logging in user ID:", warehouseman.id);
+
         Alert.alert('Success', `Welcome, ${warehouseman.name}`, [
-          { text: 'OK', onPress: () => navigation.navigate('Home') },
+          
+          { text: 'OK', onPress: () => navigation.navigate('Home', { userId: warehouseman.id }) },
         ]);
+        
       } else {
         Alert.alert('Error', 'Invalid Secret Key');
       }
@@ -74,11 +79,23 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                 placeholderTextColor="#666"
                 value={secretKey}
                 onChangeText={setSecretKey}
-                secureTextEntry
+                secureTextEntry={!showSecretKey}
                 autoCapitalize="none"
                 autoCorrect={false}
               />
-            </View>
+
+                  <TouchableOpacity 
+                    style={styles.eyeIcon}
+                    onPress={() => setShowSecretKey(!showSecretKey)}
+                  >
+                        <Ionicons 
+                          name={showSecretKey ? "eye-off" : "eye"} 
+                          size={24} 
+                          color="#666" 
+                        />
+                      </TouchableOpacity>
+                    </View>
+
 
             <TouchableOpacity
               style={[
@@ -141,23 +158,26 @@ const styles = StyleSheet.create({
   inputContainer: {
     width: '100%',
     maxWidth: 320,
-    marginBottom: 24,
-  },
-  input: {
-    height: 56,
+    flexDirection: 'row',  
+    alignItems: 'center', 
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderRadius: 12,
     paddingHorizontal: 16,
-    fontSize: 16,
-    color: '#333',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
+    marginBottom: 24,
+  },
+  input: {
+    flex: 1,  
+    height: 56,
+    fontSize: 16,
+    color: '#333',
+  },
+  eyeIcon: {
+    padding: 10, 
   },
   button: {
     backgroundColor: '#fff',
@@ -168,12 +188,10 @@ const styles = StyleSheet.create({
     maxWidth: 320,
     elevation: 3,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+    marginTop: 16,
   },
   buttonText: {
     color: '#6200ee',
@@ -187,5 +205,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
+
 
 export default LoginScreen;

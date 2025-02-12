@@ -21,9 +21,9 @@ export class AuthService {
         throw error;
     }
 }
-  static async getWarehousemanById(id: number): Promise<Warehouseman | null> {
+  static async getWarehousemanById(userId: number | string): Promise<Warehouseman | null> {
     try {
-      const response = await api.get<Warehouseman>(`/warehousemans/${id}`);
+      const response = await api.get<Warehouseman>(`/warehousemans/${userId}`);
       return response.data;
     } catch (error) {
       console.error('Get warehouseman error:', error);

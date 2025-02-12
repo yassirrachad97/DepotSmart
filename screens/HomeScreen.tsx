@@ -4,9 +4,8 @@ import {
   Text,
   StyleSheet,
   SafeAreaView,
-  TouchableOpacity,
+  ActivityIndicator,
   Alert,
-  ActivityIndicator
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
@@ -30,47 +29,27 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation, route }) => {
   const [warehouseman, setWarehouseman] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadWarehousemanData();
-  }, []);
-
+ 
   const loadWarehousemanData = async () => {
     try {
       if (route.params?.userId) {
         const data = await AuthService.getWarehousemanById(route.params.userId);
         setWarehouseman(data);
+      } else {
+        console.log("No userId found in route params.");
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to load user data');
       console.error('Error loading user data:', error);
+      Alert.alert('Error', 'Failed to load user data');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLogout = () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: () => {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'Welcome' }],
-            });
-          },
-        },
-      ],
-      { cancelable: true }
-    );
-  };
+  
+  useEffect(() => {
+    loadWarehousemanData();
+  }, [route.params?.userId]);
 
   if (loading) {
     return (
@@ -85,37 +64,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation, route }) => {
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.welcomeText}>
-            Welcome back, {warehouseman?.name || 'User'}
+            Welcome, {warehouseman?.name || 'User'}
           </Text>
-          <TouchableOpacity 
-            style={styles.logoutButton}
-            onPress={handleLogout}
-          >
-            <Text style={styles.logoutButtonText}>Logout</Text>
-          </TouchableOpacity>
         </View>
-
-        <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>User Information</Text>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>ID:</Text>
-            <Text style={styles.infoValue}>{warehouseman?.id}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Name:</Text>
-            <Text style={styles.infoValue}>{warehouseman?.name}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>City:</Text>
-            <Text style={styles.infoValue}>{warehouseman?.city}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Warehouse ID:</Text>
-            <Text style={styles.infoValue}>{warehouseman?.warehouseId}</Text>
-          </View>
-        </View>
-
-        {/* Add more content sections here */}
       </View>
     </SafeAreaView>
   );
@@ -137,7 +88,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 24,
   },
@@ -145,50 +96,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
-  },
-  logoutButton: {
-    backgroundColor: '#ff4444',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  logoutButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  infoCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  infoTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 16,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    marginBottom: 12,
-  },
-  infoLabel: {
-    flex: 1,
-    fontSize: 16,
-    color: '#666',
-  },
-  infoValue: {
-    flex: 2,
-    fontSize: 16,
-    color: '#333',
-    fontWeight: '500',
   },
 });
 
