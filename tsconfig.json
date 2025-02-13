@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,  
+    "isolatedModules": true,  
     "target": "es2016",
     "module": "commonjs",
     "jsx": "react",

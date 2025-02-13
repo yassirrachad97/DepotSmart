@@ -78,4 +78,35 @@ export class ProductsService {
       throw error;
     }
   }
+
+  static async getStatistics() {
+    try {
+      const response = await api.get('/statistics');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching statistics:', error);
+      throw error;
+    }
+  }
+  static async calculateStatistics() {
+    try {
+      const products = await this.getAllProducts();
+  
+      const totalProducts = products.length;
+      const outOfStock = products.filter(product => 
+        !product.stocks || product.stocks.every(stock => stock.quantity === 0)
+      ).length;
+  
+      const totalStockValue = products.reduce((total, product) => {
+        const productValue = product.stocks.reduce((sum, stock) => sum + (stock.quantity * product.price), 0);
+        return total + productValue;
+      }, 0);
+  
+      return { totalProducts, outOfStock, totalStockValue };
+    } catch (error) {
+      console.error('Error calculating statistics:', error);
+      throw error;
+    }
+  }
+    
 }

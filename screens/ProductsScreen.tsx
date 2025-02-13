@@ -9,17 +9,22 @@ import {
   Image,
   ActivityIndicator,
   Animated,
+  Modal,
+  ScrollView,
+  Button,
 } from 'react-native';
 import { ProductsService } from '../services/products';
 import { Product } from '../types/index';
+import * as Print from 'expo-print';
 
 const ProductScreen: React.FC<{ route: any }> = ({ route }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
   const spinValue = new Animated.Value(0);
 
   const { userId } = route.params || { userId: null };
-
 
   const spin = spinValue.interpolate({
     inputRange: [0, 1],
@@ -38,7 +43,6 @@ const ProductScreen: React.FC<{ route: any }> = ({ route }) => {
       }
     };
 
-    
     Animated.loop(
       Animated.timing(spinValue, {
         toValue: 1,
@@ -57,20 +61,67 @@ const ProductScreen: React.FC<{ route: any }> = ({ route }) => {
         <Text style={styles.productName}>{item.name}</Text>
         <Text style={styles.productType}>{item.type}</Text>
         <Text style={styles.productPrice}>${item.price}</Text>
-        <TouchableOpacity style={styles.productButton}>
+        <TouchableOpacity
+          style={styles.productButton}
+          onPress={() => {
+            setSelectedProduct(item);
+            setModalVisible(true);
+          }}
+        >
           <Text style={styles.productButtonText}>View Details</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedProduct(null);
+  };
+
+  const printProductDetails = async () => {
+    if (selectedProduct) {
+      const htmlContent = `
+        <h1>${selectedProduct.name}</h1>
+        <img src="${selectedProduct.image}" alt="${selectedProduct.name}" style="width: 100%; height: auto;" />
+        <p><strong>Type:</strong> ${selectedProduct.type}</p>
+        <p><strong>Price:</strong> ${selectedProduct.price} MAD</p>
+        <p><strong>Supplier:</strong> ${selectedProduct.supplier}</p>
+        <p><strong>Barcode:</strong> ${selectedProduct.barcode}</p>
+        <h2>Stocks:</h2>
+        <ul>
+          ${selectedProduct.stocks
+            ?.map(
+              (stock) => `
+            <li>
+              <strong>${stock.name}</strong>: ${stock.quantity} (${stock.localisation.city})
+            </li>
+          `
+            )
+            .join('')}
+        </ul>
+      `;
+
+      try {
+        const { uri } = await Print.printToFileAsync({ html: htmlContent });
+        console.log('PDF generated at:', uri);
+        await Print.printAsync({ uri });
+      } catch (error) {
+        console.error('Error generating or printing PDF:', error);
+      }
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <Animated.View style={[styles.spinner, { transform: [{ rotate: spin }] }]}>
-          <ActivityIndicator size="large" color="#6200ee" />
-        </Animated.View>
-        <Text style={styles.loadingText}>Loading products...</Text>
+      
+        <View>
+          <Animated.View style={[styles.spinner, { transform: [{ rotate: spin }] }]}>
+            <ActivityIndicator size="large" color="#6200ee" />
+          </Animated.View>
+          <Text style={styles.loadingText}>Loading products...</Text>
+        </View>
       </View>
     );
   }
@@ -82,6 +133,52 @@ const ProductScreen: React.FC<{ route: any }> = ({ route }) => {
         renderItem={renderProduct}
         keyExtractor={(item) => item.id.toString()}
       />
+
+     
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            {selectedProduct && (
+              <ScrollView>
+              
+                <View>
+                  <Text style={styles.modalTitle}>{selectedProduct.name}</Text>
+                  <Image source={{ uri: selectedProduct.image }} style={styles.modalImage} />
+                  <Text style={styles.modalText}>Type: {selectedProduct.type}</Text>
+                  <Text style={styles.modalText}>Price: ${selectedProduct.price}</Text>
+                  <Text style={styles.modalText}>Supplier: {selectedProduct.supplier}</Text>
+                  <Text style={styles.modalText}>Barcode: {selectedProduct.barcode}</Text>
+                  <Text style={styles.modalText}>Stocks:</Text>
+                  {selectedProduct.stocks?.map((stock, index) => (
+                    <View key={index} style={styles.stockItem}>
+                      <Text style={styles.stockText}>Name: {stock.name}</Text>
+                      <Text style={styles.stockText}>Quantity: {stock.quantity}</Text>
+                      <Text style={styles.stockText}>
+                        Location: {stock.localisation.city} (Lat: {stock.localisation.latitude}, Lng: {stock.localisation.longitude})
+                      </Text>
+                    </View>
+                  ))}
+                <View style={styles.buttonContainer}>
+                
+                <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+                    <Text style={styles.closeButtonText}>Close</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity style={styles.closeButton} onPress={printProductDetails}>
+                    <Text style={styles.closeButtonText}>Print Details</Text>
+                </TouchableOpacity>
+                </View>
+                </View>
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -156,6 +253,65 @@ const styles = StyleSheet.create({
   productButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '90%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    maxHeight: '80%',
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#6200ee',
+    marginBottom: 10,
+  },
+  modalImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 8,
+  },
+  stockItem: {
+    marginBottom: 10,
+    padding: 10,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 6,
+  },
+  stockText: {
+    fontSize: 14,
+    color: '#666',
+  },
+  buttonContainer: {
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    marginTop: 10,
+  },
+  closeButton: {
+    backgroundColor: '#6200ee',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+    flex: 1,
+    marginHorizontal: 5, 
+    alignItems: 'center', 
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
