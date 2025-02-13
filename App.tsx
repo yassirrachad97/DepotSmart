@@ -10,6 +10,7 @@ import ProductsScreen from './screens/ProductsScreen';
 import ScanQRScreen from './screens/ScanQRScreen';
 import ProfileScreen from './screens/ProfileScreen';
 
+
 export type RootStackParamList = {
   Welcome: undefined;
   Login: undefined;
