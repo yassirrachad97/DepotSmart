@@ -27,11 +27,11 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const MyTabs = ({ route }: { route: any }) => {
-  const { userId } = route.params; 
+  const { userId } = route.params || {};
 
   return (
     <Tab.Navigator
-      initialRouteName="Home"
+      initialRouteName="TabHome"
       screenOptions={{
         tabBarStyle: { backgroundColor: '#6200ee' },
         tabBarActiveTintColor: '#fff',
@@ -39,7 +39,7 @@ const MyTabs = ({ route }: { route: any }) => {
       }}
     >
       <Tab.Screen
-        name="Home"
+        name="TabHome"
         component={HomeScreen}
         initialParams={{ userId }} 
         options={{
@@ -50,7 +50,8 @@ const MyTabs = ({ route }: { route: any }) => {
       />
       <Tab.Screen
         name="Products"
-        component={ProductsScreen}
+        component={ProductsScreen}  
+        initialParams={{ userId }}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="list" size={size} color={color} />

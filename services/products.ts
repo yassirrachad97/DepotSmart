@@ -65,4 +65,17 @@ export class ProductsService {
       throw error;
     }
   }
+
+  static async getProductByBarcode(barcode: string): Promise<Product | null> {
+    try {
+      const response = await api.get<Product[]>(`/products?barcode=${barcode}`);
+      if (response.data && response.data.length > 0) {
+        return response.data[0]; 
+      }
+      return null;
+    } catch (error) {
+      console.error('Error fetching product by barcode:', error);
+      throw error;
+    }
+  }
 }
