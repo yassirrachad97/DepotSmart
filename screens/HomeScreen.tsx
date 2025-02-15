@@ -84,7 +84,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation, route }) => {
             </Text>
           </View>
 
-          {/* Statistiques */}
+         
           <View style={styles.statsContainer}>
             <Text style={styles.statTitle}>📊 Statistiques Générales</Text>
 
@@ -107,7 +107,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation, route }) => {
             </View>
           </View>
 
-          {/* Bouton voir plus */}
+        
           <TouchableOpacity
             style={styles.viewMoreButton}
             // onPress={() => navigation.navigate('StatisticsDetails')}

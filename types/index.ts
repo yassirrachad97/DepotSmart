@@ -37,6 +37,7 @@ export interface Location {
     city: string;
     secretKey: string;
     warehouseId: number;
+    profilePicture?: string;
   }
   
   export interface Statistics {

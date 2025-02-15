@@ -11,7 +11,6 @@ import {
   Animated,
   Modal,
   ScrollView,
-  Button,
 } from 'react-native';
 import { ProductsService } from '../services/products';
 import { Product } from '../types/index';
@@ -56,7 +55,11 @@ const ProductScreen: React.FC<{ route: any }> = ({ route }) => {
 
   const renderProduct = ({ item }: { item: Product }) => (
     <View style={styles.productCard}>
-      <Image source={{ uri: item.image }} style={styles.productImage} />
+      <Image
+        source={{ uri: item.image || 'https://via.placeholder.com/150' }} // Fallback image
+        style={styles.productImage}
+        onError={(error) => console.log('Failed to load image:', error.nativeEvent.error)}
+      />
       <View style={styles.productDetails}>
         <Text style={styles.productName}>{item.name}</Text>
         <Text style={styles.productType}>{item.type}</Text>
@@ -83,7 +86,7 @@ const ProductScreen: React.FC<{ route: any }> = ({ route }) => {
     if (selectedProduct) {
       const htmlContent = `
         <h1>${selectedProduct.name}</h1>
-        <img src="${selectedProduct.image}" alt="${selectedProduct.name}" style="width: 100%; height: auto;" />
+        <img src="${selectedProduct.image || 'https://via.placeholder.com/150'}" alt="${selectedProduct.name}" style="width: 100%; height: auto;" />
         <p><strong>Type:</strong> ${selectedProduct.type}</p>
         <p><strong>Price:</strong> ${selectedProduct.price} MAD</p>
         <p><strong>Supplier:</strong> ${selectedProduct.supplier}</p>
@@ -115,7 +118,6 @@ const ProductScreen: React.FC<{ route: any }> = ({ route }) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-      
         <View>
           <Animated.View style={[styles.spinner, { transform: [{ rotate: spin }] }]}>
             <ActivityIndicator size="large" color="#6200ee" />
@@ -134,7 +136,6 @@ const ProductScreen: React.FC<{ route: any }> = ({ route }) => {
         keyExtractor={(item) => item.id.toString()}
       />
 
-     
       <Modal
         visible={modalVisible}
         animationType="slide"
@@ -145,10 +146,13 @@ const ProductScreen: React.FC<{ route: any }> = ({ route }) => {
           <View style={styles.modalContent}>
             {selectedProduct && (
               <ScrollView>
-              
                 <View>
                   <Text style={styles.modalTitle}>{selectedProduct.name}</Text>
-                  <Image source={{ uri: selectedProduct.image }} style={styles.modalImage} />
+                  <Image
+                    source={{ uri: selectedProduct.image || 'https://via.placeholder.com/150' }} // Fallback image
+                    style={styles.modalImage}
+                    onError={(error) => console.log('Failed to load image:', error.nativeEvent.error)}
+                  />
                   <Text style={styles.modalText}>Type: {selectedProduct.type}</Text>
                   <Text style={styles.modalText}>Price: ${selectedProduct.price}</Text>
                   <Text style={styles.modalText}>Supplier: {selectedProduct.supplier}</Text>
@@ -163,16 +167,14 @@ const ProductScreen: React.FC<{ route: any }> = ({ route }) => {
                       </Text>
                     </View>
                   ))}
-                <View style={styles.buttonContainer}>
-                
-                <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-                    <Text style={styles.closeButtonText}>Close</Text>
-                </TouchableOpacity>
-                
-                <TouchableOpacity style={styles.closeButton} onPress={printProductDetails}>
-                    <Text style={styles.closeButtonText}>Print Details</Text>
-                </TouchableOpacity>
-                </View>
+                  <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+                      <Text style={styles.closeButtonText}>Close</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.closeButton} onPress={printProductDetails}>
+                      <Text style={styles.closeButtonText}>Print Details</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </ScrollView>
             )}
@@ -295,8 +297,8 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   buttonContainer: {
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 10,
   },
   closeButton: {
@@ -305,8 +307,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 6,
     flex: 1,
-    marginHorizontal: 5, 
-    alignItems: 'center', 
+    marginHorizontal: 5,
+    alignItems: 'center',
   },
   closeButtonText: {
     color: '#fff',

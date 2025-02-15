@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Alert, Button, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, Image, ScrollView, Button } from 'react-native';
 import { Warehouseman } from '../types/index'; 
 import { AuthService } from '../services/auth'; 
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface ProfileScreenProps {
   route: RouteProp<any, 'Profile'>;
@@ -19,7 +21,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
   const fetchWarehousemanData = useCallback(async () => {
     setLoading(true);
     setError(null); 
-
+  
     try {
       const data = await AuthService.getWarehousemanById(userId);  
       if (data) {
@@ -28,6 +30,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
         setError('Utilisateur non trouvé');
       }
     } catch (error) {
+      console.error('Error fetching warehouseman:', error);
       setError("Impossible de charger l'utilisateur");
     } finally {
       setLoading(false);
@@ -56,7 +59,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
           text: 'Logout',
           style: 'destructive',
           onPress: () => {
-            
             navigation.reset({
               index: 0,
               routes: [{ name: 'Welcome' }],  
@@ -94,43 +96,54 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.infoCard}>
-        <Text style={styles.infoTitle}>Informations Utilisateur</Text>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>ID:</Text>
-          <Text style={styles.infoValue}>{warehouseman.id}</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Nom:</Text>
-          <Text style={styles.infoValue}>{warehouseman.name}</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Ville:</Text>
-          <Text style={styles.infoValue}>{warehouseman.city}</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>WarID:</Text>
-          <Text style={styles.infoValue}>{warehouseman.warehouseId}</Text>
-        </View>
+    <LinearGradient colors={['#6a11cb', '#2575fc']} style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.profileHeader}>
         
+          <Image
+            source={require('../assets/amine.jpeg')} 
+            style={styles.profileImage}
+            onError={(error) => console.log('Failed to load profile picture:', error.nativeEvent.error)}
+          />
+          <Text style={styles.profileName}>{warehouseman.name}</Text>
+          <Text style={styles.profileCity}>{warehouseman.city}</Text>
+        </View>
+
+        <View style={styles.infoCard}>
+          <Text style={styles.infoTitle}>Informations Utilisateur</Text>
+          <View style={styles.infoRow}>
+            <Icon name="person" size={20} color="#6a11cb" />
+            <Text style={styles.infoLabel}>ID:</Text>
+            <Text style={styles.infoValue}>{warehouseman.id}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Icon name="home" size={20} color="#6a11cb" />
+            <Text style={styles.infoLabel}>Warehouse ID:</Text>
+            <Text style={styles.infoValue}>{warehouseman.warehouseId}</Text>
+          </View>
+        </View>
+
         <TouchableOpacity 
           style={styles.logoutButton}
           onPress={handleLogout}
         >
+          <Icon name="logout" size={20} color="white" />
           <Text style={styles.logoutButtonText}>Logout</Text>
         </TouchableOpacity>
-      </View>
-    </View>
+      </ScrollView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 16,
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
   },
   loadingContainer: {
     flex: 1,
@@ -143,10 +156,31 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 10,
   },
+  profileHeader: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
+  },
+  profileName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  profileCity: {
+    fontSize: 16,
+    color: 'white',
+  },
   infoCard: {
     backgroundColor: 'white',
     borderRadius: 12,
     padding: 16,
+    width: '100%',
+    marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -161,12 +195,14 @@ const styles = StyleSheet.create({
   },
   infoRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 12,
   },
   infoLabel: {
     flex: 1,
     fontSize: 16,
     color: '#666',
+    marginLeft: 10,
   },
   infoValue: {
     flex: 2,
@@ -175,15 +211,19 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   logoutButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#ff4444',
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 12,
     borderRadius: 8,
     marginTop: 20,
   },
   logoutButtonText: {
     color: 'white',
     fontWeight: 'bold',
+    marginLeft: 10,
   },
 });
 

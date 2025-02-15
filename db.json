@@ -91,7 +91,6 @@
         }
       ]
     },
-   
     {
       "id": "3808",
       "name": "Saus",
@@ -99,8 +98,29 @@
       "barcode": "6111128000088",
       "price": 7,
       "supplier": "Eux",
-      "image": "",
+      "image": "https://via.placeholder.com/150",
       "stocks": []
+    },
+    {
+      "id": "9f5a",
+      "name": "Ghait",
+      "type": "Eux",
+      "barcode": "6111128001139",
+      "price": 3,
+      "supplier": "Bouteille ",
+      "image": "https://via.placeholder.com/150",
+      "stocks": [
+        {
+          "id": 1999,
+          "name": "Gueliz B2",
+          "quantity": 20,
+          "localisation": {
+            "city": "Marrakesh",
+            "latitude": 0,
+            "longitude": 0
+          }
+        }
+      ]
     }
   ],
   "warehousemans": [
@@ -110,7 +130,8 @@
       "dob": "1988-05-02",
       "city": "Oujda",
       "secretKey": "AH90907J",
-      "warehouseId": 1999
+      "warehouseId": 1999,
+      "profilePicture": "https://example.com/amine.jpg"
     },
     {
       "id": "1444",
@@ -118,7 +139,8 @@
       "dob": "1990-09-15",
       "city": "Marrakesh",
       "secretKey": "RK189987A",
-      "warehouseId": 2991
+      "warehouseId": 2991,
+      "profilePicture": "https://example.com/karim.jpg"
     }
   ],
   "statistics": {

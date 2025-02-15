@@ -15,7 +15,9 @@ export class ProductsService {
 
   static async getProductById(id: number): Promise<Product> {
     try {
+      console.log(`Fetching product with ID ${id}`);
       const response = await api.get<Product>(`/products/${id}`);
+      console.log('Product data:', response.data);
       return response.data;
     } catch (error) {
       console.error('Get product error:', error);
@@ -52,16 +54,20 @@ export class ProductsService {
     }
   }
 
-  static async updateStock(productId: number, stockId: number, quantity: number): Promise<Product> {
+  static async updateStockQuantity(productId: number, stockId: number, quantity: number): Promise<Product> {
     try {
+      console.log(`Updating stock quantity for product ${productId}, stock ${stockId} to ${quantity}`);
       const product = await this.getProductById(productId);
-      const updatedStocks = product.stocks.map(stock => 
+      const updatedStocks = product.stocks.map(stock =>
         stock.id === stockId ? { ...stock, quantity } : stock
       );
-      
-      return await this.updateProduct(productId, { stocks: updatedStocks });
+      console.log('Updated stocks:', updatedStocks);
+  
+      const response = await api.patch<Product>(`/products/${productId}`, { stocks: updatedStocks });
+      console.log('Update response:', response.data);
+      return response.data;
     } catch (error) {
-      console.error('Update stock error:', error);
+      console.error('Update stock quantity error:', error);
       throw error;
     }
   }
@@ -108,5 +114,8 @@ export class ProductsService {
       throw error;
     }
   }
+
+
+  
     
 }
