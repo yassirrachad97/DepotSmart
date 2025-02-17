@@ -8,7 +8,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "server": "json-server --watch db.json --port 3000",
-     "test": "jest"
+    "test": "jest"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.1.1",
@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@types/jest": "^29.5.14",
     "@types/react": "^18.3.18",
     "@types/react-native": "^0.72.8",
     "json-server": "^1.0.0-beta.3",
@@ -50,11 +51,12 @@
     "type": "git",
     "url": "git+https://github.com/yassirrachad97/DepotSmart.git"
   },
-  "jest": {
-  "preset": "jest-expo",
-  "setupFilesAfterEnv": ["@testing-library/jest-native/extend-expect"]
-},
-
+ "jest": {
+    "preset": "jest-expo",
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.|@expo-google-fonts/.|react-navigation|@react-navigation/.|@unimodules/.|unimodules|sentry-expo|native-base|react-native-svg)"
+    ]
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

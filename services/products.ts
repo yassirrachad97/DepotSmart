@@ -13,7 +13,7 @@ export class ProductsService {
     }
   }
 
-  static async getProductById(id: number): Promise<Product> {
+  static async getProductById(id: string): Promise<Product> {
     try {
       console.log(`Fetching product with ID ${id}`);
       const response = await api.get<Product>(`/products/${id}`);
@@ -36,40 +36,61 @@ export class ProductsService {
   }
 
   
-
-
-
-  static async updateStockQuantity(productId: number, stockId: number, quantity: number): Promise<Product> {
+  static async updateStockQuantity(productId: string, stockId: number, quantity: number) {
     try {
-      console.log(`Updating stock quantity for product ${productId}, stock ${stockId} to ${quantity}`);
-      
      
-      const product = await this.getProductById(productId);
-      console.log('Fetched product:', product);
-  
-      const updatedStocks = product.stocks.map(stock =>
-        stock.id === stockId ? { ...stock, quantity } : stock
-      );
-      console.log('Updated stocks:', updatedStocks);
-  
-      const response = await api.patch<Product>(`/products/${productId}`, { stocks: updatedStocks });
-      console.log('Update response:', response.data);
-  
-      return response.data;
-    } catch (error) {
-      console.error('Update stock quantity error:', error);
-      if (error.response) {
-        console.error('Response data:', error.response.data);
-        console.error('Response status:', error.response.status);
-        console.error('Response headers:', error.response.headers);
-      } else if (error.request) {
-        console.error('Request data:', error.request);
-      } else {
-        console.error('Error message:', error.message);
+
+      const product: any = await this.getProductById(productId);
+      if (!product || !product.stocks) {
+        throw new Error("Produit ou stock introuvable");
       }
-      throw error;
+
+      const stockToUpdate = product.stocks.find((stock: any) => stock.id === "1999");
+      if (!stockToUpdate) {
+        throw new Error("Emplacement non trouvé dans le stock");
+      }
+
+      const updatedStocks = product.stocks.map((stock: any) =>
+        stock.id === stockToUpdate.id
+          ? { ...stock, quantity: parseInt(quantity.toString()) }
+          : stock
+      );
+
+    
+
+      const nexwss ={ ...product, stocks: updatedStocks };
+      console.log(nexwss);
+      
+
+      const response = await fetch(`http://172.16.11.36:3000/products/${product.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({ ...product, stocks: updatedStocks }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+      
+        throw new Error(`La mise à jour a échoué: ${response.status}`);
+      }
+
+      const updatedProduct = await response.json();
+      
+
+      return updatedProduct;
+    } catch (error) {
+     
+      throw new Error(error.message || "Une erreur inconnue s'est produite.");
     }
   }
+  
+
+
+    
+  
 
   static async getProductByBarcode(barcode: string): Promise<Product | null> {
     try {

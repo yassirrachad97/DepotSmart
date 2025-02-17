@@ -143,6 +143,28 @@
         }
       ],
       "editedBy": []
+    },
+    {
+      "id": "705b",
+      "name": "Ain atlass",
+      "type": "Bouteille ",
+      "barcode": "6111035001673",
+      "price": 3,
+      "supplier": "Eaux",
+      "image": "",
+      "stocks": [
+        {
+          "id": "1999",
+          "name": "Gueliz B2",
+          "quantity": 29,
+          "localisation": {
+            "city": "Marrakesh",
+            "latitude": 34.689404,
+            "longitude": -1.912823
+          }
+        }
+      ],
+      "editedBy": []
     }
   ],
   "warehousemans": [

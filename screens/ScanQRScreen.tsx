@@ -144,17 +144,21 @@ const ScanQRScreen = () => {
     };
 
     const handleUpdateQuantity = async () => {
-        if (!product || !product.stocks || product.stocks.length === 0) {
+        console.log(product);
+        if (!product) {
           Alert.alert("Erreur", "Aucun stock trouvé pour ce produit.");
           return;
         }
       
         try {
-          const updatedProduct = await ProductsService.updateStockQuantity(
-            Number(product.id),
+          const updatedProduct:any = await ProductsService.updateStockQuantity(
+            String(product.id),
             Number(product.stocks[0].id),
             Number(quantity) 
           );
+          console.log("===========aaaaaa");
+          console.log(updatedProduct);
+          console.log("===========");
           setProduct(updatedProduct);
           Alert.alert("Succès", "Quantité mise à jour avec succès!");
         } catch (error) {
