@@ -98,7 +98,7 @@
       "barcode": "6111128000088",
       "price": 7,
       "supplier": "Eux",
-      "image": "https://via.placeholder.com/150",
+      "image": "",
       "stocks": []
     },
     {
@@ -111,7 +111,7 @@
       "image": "https://via.placeholder.com/150",
       "stocks": [
         {
-          "id": 1999,
+          "id": "1999",
           "name": "Gueliz B2",
           "quantity": 20,
           "localisation": {
@@ -121,6 +121,28 @@
           }
         }
       ]
+    },
+    {
+      "id": "4c28",
+      "name": "Brosse ",
+      "type": "Plastique ",
+      "barcode": "8714789823775",
+      "price": 10,
+      "supplier": "Dentiste ",
+      "image": "",
+      "stocks": [
+        {
+          "id": "1999",
+          "name": "Gueliz B2",
+          "quantity": 5,
+          "localisation": {
+            "city": "Marrakesh",
+            "latitude": 0,
+            "longitude": 0
+          }
+        }
+      ],
+      "editedBy": []
     }
   ],
   "warehousemans": [

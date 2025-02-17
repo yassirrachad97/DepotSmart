@@ -1,34 +1,34 @@
 import React, { useState, useRef } from 'react';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Button, StyleSheet, Text, TouchableOpacity, View, Modal, TextInput, Image, ScrollView, Alert } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; // For stock selection
+import { Picker } from '@react-native-picker/picker'; 
 import { ProductsService } from '../services/products';
-import { Product } from '../types/index'; // Import the Product type
+import { Product } from '../types/index'; 
 
 const ScanQRScreen = () => {
     const [permission, requestPermission] = useCameraPermissions();
     const [scanned, setScanned] = useState(false);
     const [barcode, setBarcode] = useState('');
-    const [product, setProduct] = useState<Product | null>(null); // Properly typed
+    const [product, setProduct] = useState<Product | null>(null);
     const [showForm, setShowForm] = useState(false);
     const [manualInput, setManualInput] = useState(false);
     const [loading, setLoading] = useState(false);
     const [manualBarcode, setManualBarcode] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
-    const [quantity, setQuantity] = useState<number>(0); // State for quantity input
+    const [quantity, setQuantity] = useState<number>(0); 
 
-    // Form fields
+   
     const [productName, setProductName] = useState('');
     const [productType, setProductType] = useState('');
     const [productPrice, setProductPrice] = useState('');
     const [productSupplier, setProductSupplier] = useState('');
     const [productImage, setProductImage] = useState('');
 
-    // Stock selection
-    const [selectedStock, setSelectedStock] = useState('1999'); // Default to Gueliz B2
+   
+    const [selectedStock, setSelectedStock] = useState('1999'); 
     const [stockQuantity, setStockQuantity] = useState('');
 
-    // List of available stocks
+    
     const stocks = [
         { id: '1999', name: 'Gueliz B2', city: 'Marrakesh' },
         { id: '2991', name: 'Lazari H2', city: 'Oujda' },
@@ -46,7 +46,7 @@ const ScanQRScreen = () => {
         );
     }
 
-    // Reset state when starting a new scan
+   
     const resetState = () => {
         setProduct(null);
         setShowForm(false);
@@ -55,9 +55,9 @@ const ScanQRScreen = () => {
         setProductPrice('');
         setProductSupplier('');
         setProductImage('');
-        setSelectedStock('1999'); // Reset to default stock
+        setSelectedStock('1999'); 
         setStockQuantity('');
-        setQuantity(0); // Reset quantity
+        setQuantity(0); 
     };
 
     const fetchProduct = async (barcode: string) => {
@@ -66,15 +66,15 @@ const ScanQRScreen = () => {
             const foundProduct = await ProductsService.getProductByBarcode(barcode);
             if (foundProduct) {
                 setProduct(foundProduct);
-                setQuantity(foundProduct.stocks[0]?.quantity || 0); // Set initial quantity
-                setShowForm(false); // Hide form if product is found
-                setModalVisible(true); // Show modal with product details
+                setQuantity(foundProduct.stocks[0]?.quantity || 0); 
+                setShowForm(false);
+                setModalVisible(true); 
             } else {
-                setShowForm(true); // Show form if product doesn't exist
+                setShowForm(true); 
             }
         } catch (error) {
             console.error('Error fetching product:', error);
-            setShowForm(true); // Show form in case of error
+            setShowForm(true);
         } finally {
             setLoading(false);
         }
@@ -102,14 +102,14 @@ const ScanQRScreen = () => {
             return;
         }
 
-        // Create the new product object
+     
         const newProduct = {
             name: productName,
             type: productType,
             barcode,
             price: parseFloat(productPrice),
             supplier: productSupplier,
-            image: productImage || 'https://via.placeholder.com/150', // Fallback image
+            image: productImage , 
             stocks: [
                 {
                     id: selectedStock,
@@ -117,15 +117,16 @@ const ScanQRScreen = () => {
                     quantity: parseInt(stockQuantity),
                     localisation: {
                         city: stocks.find(stock => stock.id === selectedStock)?.city || '',
-                        latitude: 0,
-                        longitude: 0,
+                        latitude: 34.689404,
+                        longitude: -1.912823,
                     },
                 },
             ],
+            editedBy: [],
         };
 
         try {
-            // Save the product to the backend
+           
             const createdProduct = await ProductsService.createProduct(newProduct);
             setProduct(createdProduct);
             setShowForm(false);
@@ -150,9 +151,9 @@ const ScanQRScreen = () => {
       
         try {
           const updatedProduct = await ProductsService.updateStockQuantity(
-            product.id, // No need for parseInt since id is a number
-            product.stocks[0].id, // Ensure this is a number
-            quantity
+            Number(product.id),
+            Number(product.stocks[0].id),
+            Number(quantity) 
           );
           setProduct(updatedProduct);
           Alert.alert("Succès", "Quantité mise à jour avec succès!");
@@ -197,7 +198,7 @@ const ScanQRScreen = () => {
                     {product ? (
                         <View>
                             <Image
-                                source={{ uri: product.image || 'https://via.placeholder.com/150' }} // Fallback image
+                                source={{ uri: product.image }}
                                 style={styles.productImage}
                                 onError={(error) => console.log('Failed to load image:', error.nativeEvent.error)}
                             />
@@ -245,7 +246,7 @@ const ScanQRScreen = () => {
                 </ScrollView>
             )}
 
-            {/* Modal for Product Details */}
+          
             <Modal
                 visible={modalVisible}
                 animationType="slide"
@@ -259,8 +260,8 @@ const ScanQRScreen = () => {
                                 <View>
                                     <Text style={styles.modalTitle}>{product.name}</Text>
                                     <Image
-                                        source={{ uri: product.image || 'https://via.placeholder.com/150' }} // Fallback image
-                                        style={styles.modalImage} // Use modalImage style
+                                        source={{ uri: product.image  }} 
+                                        style={styles.modalImage} 
                                         onError={(error) => console.log('Failed to load image:', error.nativeEvent.error)}
                                     />
                                     <Text style={styles.modalText}>Type: {product.type}</Text>
@@ -301,7 +302,7 @@ const ScanQRScreen = () => {
                 </View>
             </Modal>
 
-            {/* Modal for Manual Barcode Input */}
+         
             <Modal visible={manualInput} transparent animationType="slide">
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalView}>
@@ -323,6 +324,9 @@ const ScanQRScreen = () => {
 
 const styles = StyleSheet.create({
     container: { flex: 1, justifyContent: 'center' },
+    message: { fontSize: 16, textAlign: 'center', marginBottom: 20 },
+    submitButtonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
+    
     camera: { flex: 1 },
     detailsContainer: { padding: 20 },
     formContainer: { padding: 20 },
